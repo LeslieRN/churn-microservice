@@ -52,3 +52,20 @@ def predict(data: ChurnInput):
     
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+
+@app.get("/item/predictions/{item_id}")
+def get_items_predictions(item_id: str):
+    df = load_csv()
+
+    # Filtrando por public id (string comparison)
+    result = df[df["public_id"] == item_id]
+
+    if result.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Información con id '{item_id}' no fue encontrado"
+        )
+    
+    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    result_pred = model_service.predict(df_pred)
+    return {"status": "success", 'data': result.to_dict(orient='records'), 'prediction': result_pred}
