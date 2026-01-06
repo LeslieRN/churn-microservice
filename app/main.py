@@ -69,3 +69,132 @@ def get_items_predictions(item_id: str):
     df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
     result_pred = model_service.predict(df_pred)
     return {"status": "success", 'data': result.to_dict(orient='records'), 'prediction': result_pred}
+
+
+@app.get("/probability/age")
+def get_probability_by_age():
+    result = load_csv()
+    if result.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Información no fue encontrada"
+        )
+    
+    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    df_pred = model_service.predict_batch(df_pred)
+    grouped = (
+        df_pred
+        .groupby("age")
+        .agg(
+            churn_probability=("churn_prob", "mean"),
+            not_churn_probability=("not_churn_prob", "mean"),
+            users_count=("age", "count")
+        )
+        .reset_index()
+    )
+
+    # Convertir en porcentajes
+    grouped["churn_probability"] = (grouped["churn_probability"] * 100).round(2)
+    grouped["not_churn_probability"] = (grouped["not_churn_probability"] * 100).round(2)
+
+    # return JSON
+    return {
+        "total_users": len(df_pred),
+        "grouped_by_age": grouped.to_dict(orient="records")
+    }
+
+@app.get("/probability/gender")
+def get_probability_by_gender():
+    result = load_csv()
+    if result.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Información no fue encontrada"
+        )
+    
+    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    df_pred = model_service.predict_batch(df_pred)
+    grouped = (
+        df_pred
+        .groupby("gender")
+        .agg(
+            churn_probability=("churn_prob", "mean"),
+            not_churn_probability=("not_churn_prob", "mean"),
+            users_count=("gender", "count")
+        )
+        .reset_index()
+    )
+
+    # Convertir en porcentajes
+    grouped["churn_probability"] = (grouped["churn_probability"] * 100).round(2)
+    grouped["not_churn_probability"] = (grouped["not_churn_probability"] * 100).round(2)
+
+    # return JSON
+    return {
+        "total_users": len(df_pred),
+        "grouped_by_gender": grouped.to_dict(orient="records")
+    }
+
+@app.get("/probability/subscription")
+def get_probability_by_subscription_typer():
+    result = load_csv()
+    if result.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Información no fue encontrada"
+        )
+    
+    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    df_pred = model_service.predict_batch(df_pred)
+    grouped = (
+        df_pred
+        .groupby("subscription_type")
+        .agg(
+            churn_probability=("churn_prob", "mean"),
+            not_churn_probability=("not_churn_prob", "mean"),
+            users_count=("subscription_type", "count")
+        )
+        .reset_index()
+    )
+
+    # Convertir en porcentajes
+    grouped["churn_probability"] = (grouped["churn_probability"] * 100).round(2)
+    grouped["not_churn_probability"] = (grouped["not_churn_probability"] * 100).round(2)
+
+    # return JSON
+    return {
+        "total_users": len(df_pred),
+        "grouped_by_subscription_type": grouped.to_dict(orient="records")
+    }
+
+@app.get("/probability/region")
+def get_probability_by_region():
+    result = load_csv()
+    if result.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Información no fue encontrada"
+        )
+    
+    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    df_pred = model_service.predict_batch(df_pred)
+    grouped = (
+        df_pred
+        .groupby("region")
+        .agg(
+            churn_probability=("churn_prob", "mean"),
+            not_churn_probability=("not_churn_prob", "mean"),
+            users_count=("region", "count")
+        )
+        .reset_index()
+    )
+
+    # Convertir en porcentajes
+    grouped["churn_probability"] = (grouped["churn_probability"] * 100).round(2)
+    grouped["not_churn_probability"] = (grouped["not_churn_probability"] * 100).round(2)
+
+    # return JSON
+    return {
+        "total_users": len(df_pred),
+        "grouped_by_region": grouped.to_dict(orient="records")
+    }
