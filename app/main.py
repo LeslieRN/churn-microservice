@@ -1,3 +1,4 @@
+from app.preprocessing import lowercase_df, lowercase_dict_values
 from fastapi import FastAPI, HTTPException
 from app.schemas import ChurnInput
 from app.model import model_service
@@ -45,7 +46,8 @@ def get_all_items():
 @app.post("/predict")
 def predict(data: ChurnInput):
     try:
-        df = pd.DataFrame([data.dict()])
+        data = lowercase_dict_values(data.dict())
+        df = pd.DataFrame([data])
         result = model_service.predict(df)
 
         return result
@@ -66,7 +68,8 @@ def get_items_predictions(item_id: str):
             detail=f"Información con id '{item_id}' no fue encontrado"
         )
     
-    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    df_pred = result[["age", "gender", "subscription_type", "watch_hours", "region","number_of_profiles", "payment_method", "device"]]
+    df_pred = lowercase_df(df_pred)
     result_pred = model_service.predict(df_pred)
     return {"status": "success", 'data': result.to_dict(orient='records'), 'prediction': result_pred}
 
@@ -80,7 +83,8 @@ def get_probability_by_age():
             detail=f"Información no fue encontrada"
         )
     
-    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    df_pred = result[["age", "gender", "subscription_type", "watch_hours", "region", "number_of_profiles", "payment_method", "device"]]
+    df_pred = lowercase_df(df_pred)
     df_pred = model_service.predict_batch(df_pred)
     grouped = (
         df_pred
@@ -112,7 +116,8 @@ def get_probability_by_gender():
             detail=f"Información no fue encontrada"
         )
     
-    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    df_pred = result[["age", "gender", "subscription_type", "watch_hours", "region", "number_of_profiles", "payment_method", "device"]]
+    df_pred = lowercase_df(df_pred)
     df_pred = model_service.predict_batch(df_pred)
     grouped = (
         df_pred
@@ -144,7 +149,8 @@ def get_probability_by_subscription_typer():
             detail=f"Información no fue encontrada"
         )
     
-    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    df_pred = result[["age", "gender", "subscription_type", "watch_hours", "region", "number_of_profiles", "payment_method", "device"]]
+    df_pred = lowercase_df(df_pred)
     df_pred = model_service.predict_batch(df_pred)
     grouped = (
         df_pred
@@ -176,7 +182,8 @@ def get_probability_by_region():
             detail=f"Información no fue encontrada"
         )
     
-    df_pred = result[['age', 'gender', 'subscription_type', 'watch_hours', 'last_login_days', 'region']]
+    df_pred = result[["age", "gender", "subscription_type", "watch_hours", "region", "number_of_profiles", "payment_method", "device"]]
+    df_pred = lowercase_df(df_pred)
     df_pred = model_service.predict_batch(df_pred)
     grouped = (
         df_pred
