@@ -4,7 +4,7 @@ from app.schemas import ChurnInput
 
 
 class ModelService:
-    def __init__(self, model_path="rf_best.joblib"):
+    def __init__(self, model_path="rf_optimized.joblib"):
         self.model = load(model_path)
 
     def predict(self, data: ChurnInput):
