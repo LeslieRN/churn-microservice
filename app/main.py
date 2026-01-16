@@ -1,5 +1,6 @@
 from app.preprocessing import lowercase_df, lowercase_dict_values
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from app.schemas import ChurnInput
 from app.model import model_service
 import pandas as pd
@@ -7,6 +8,14 @@ import pandas as pd
 app = FastAPI(
     title="Netflix Churn Prediction API",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 CSV_PATH = "clientes_limpio.csv"
